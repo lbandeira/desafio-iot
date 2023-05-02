@@ -1,0 +1,41 @@
+{
+  "id": "64288c46-b76d-40c4-9c32-f27e46d76803",
+  "name": "Device 1",
+  "username": "user",
+  "password": "pass",
+  "key": "jDG/A9Wi33wJxgzaH5goWQ==",
+  "cameras": [
+    {
+      "id": "1",
+      "name": "Camera 1",
+      "rtsp": "rtsp://user@pass:camera/1:554",
+      "snapshot": "http://camera/1/snapshot.jpg",
+      "username": "user",
+      "password": "pass"
+    },
+    {
+      "id": "2",
+      "name": "Camera 2",
+      "rtsp": "rtsp://user@pass:camera/2:554",
+      "snapshot": "http://camera/2/snapshot.jpg",
+      "username": "user",
+      "password": "pass"
+    },
+    {
+      "id": "3",
+      "name": "Camera 3",
+      "rtsp": "rtsp://user@pass:camera/3:554",
+      "snapshot": "http://camera/3/snapshot.jpg",
+      "username": "user",
+      "password": "pass"
+    },
+    {
+      "id": "4",
+      "name": "Camera 4",
+      "rtsp": "rtsp://user@pass:camera/4:554",
+      "snapshot": "http://camera/4/snapshot.jpg",
+      "username": "user",
+      "password": "pass"
+    }
+  ]
+}
