@@ -7,7 +7,7 @@ At our company, we currently manage a fleet of 4000 cameras and 1000 Raspberry P
 
 All device information is stored in a cloud-based system that can be accessed via a URL ([devices.json](https://raw.githubusercontent.com/eusouagabriel/desafio-iot/main/devices.json) is an example that you must use in your application) that requires a JSON file. This file contains information about the device and cameras needed to access the camera stream, both live and historical.
 
-Your challenge is to develop an application that can receive this information and update it locally on the device for other applications to use. The device is running on Linux, and the architecture is ARM 64-bit. Additionally, you must explain the following points:
+Your challenge is to develop an application that can receive this information and update it locally on the device for other applications to use. The device is running on Linux. Additionally, you must explain the following points:
 
 * The chosen storage technology and the reason behind the choice. As some keys are sent, explain how they will be kept secure.
 * The technology used to receive information on the device. See a more efficient way to request data without having to load all elements of the devices.json file.
