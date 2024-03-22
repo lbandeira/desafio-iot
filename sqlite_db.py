@@ -18,7 +18,7 @@ def read_devices_from_json():
 def update_database(data):
     # Aplicar camada de seguranca em dados sensiveis
     for device in data:
-        if 'password'in device:
+        if 'password' in device:
             encrypted_password = cipher.encrypt(device['password'].encode())
             device['password'] = encrypted_password.decode()
 
@@ -29,8 +29,10 @@ def update_database(data):
                 CREATE TABLE IF NOT EXISTS devices (
                         id TEXT PRIMARY KEY,
                         name TEXT,
-                        camera_count INTEGER,
-                        password TEXT
+                        username TEXT,
+                        password TEXT,
+                        key TEXT,
+                        camera_count INTEGER
                     )
                 ''')
     
@@ -39,27 +41,39 @@ def update_database(data):
 
     # Adiciona linha na tabela
     for devices in data:
-        query = f'''INSERT INTO devices (id, name, camera_count, password) VALUES ("{devices['id']}", "{devices['name']}", "{len(devices['cameras'])}", "{devices['password']}")'''
+        query = f'''INSERT INTO devices (
+                            id, 
+                            name, 
+                            username, 
+                            password, 
+                            key,
+                            camera_count) 
+                    VALUES (
+                        "{devices['id']}", 
+                        "{devices['name']}", 
+                        "{devices['username']}", 
+                        "{devices['password']}", 
+                        "{devices['key']}", 
+                        "{len(devices['cameras'])}")'''
         print(query)
         cursor.execute(query)
 
     connect.commit()
     connect.close()
 
-def decrypted():
-    # Retrieve encrypted data from SQLite database and decrypt
-    conn = sqlite3.connect('secure_devices.db')
-    cursor = conn.cursor()
+# def decrypted():
+#     # Retrieve encrypted data from SQLite database and decrypt
+#     conn = sqlite3.connect('device_info.db')
+#     cursor = conn.cursor()
 
-    cursor.execute('SELECT * FROM devices;')
-    for row in cursor.fetchall():
-        decrypted_password = cipher.decrypt(row[3].encode()).decode()
-        print(f"Name: {row[1]}, Username: {row[2]}, Decrypted Password: {decrypted_password}")
+#     cursor.execute('SELECT * FROM devices;')
+#     for row in cursor.fetchall():
+#         decrypted_password = cipher.decrypt(row[3].encode()).decode()
+#         print(f"Name: {row[1]}, Username: {row[2]}, Decrypted Password: {decrypted_password}")
 
-    conn.close()    
+#     conn.close()    
 
 @app.route('/update_devices', methods=['POST'])
-
 def update_devices():
     #Recebe JSON pela requisicao
     data = request.get_json()
@@ -71,6 +85,15 @@ def update_devices():
         return jsonify({"message": "Database updated successfuly"}), 200
     else:
         return jsonify({"error": "Invalid JSON data"}), 400
+
+@app.route('/devices', methods = ['GET'])
+def get_devices():
+    connection = sqlite3.connect('device_info.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM devices")
+    devices = cursor.fetchall()
+    connection.close()
+    return jsonify(devices)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8080)
