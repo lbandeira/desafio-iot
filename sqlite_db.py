@@ -15,7 +15,6 @@ cipher = Fernet(key)
 #Adicionando camada de seguranca para acesso ao BD
 users = {
     'user1': {'password': 'password1', 'roles': ['admin']},
-    'user2': {'password': 'password2', 'roles': ['user']},
 }
 
 # Teste de autenticacao
