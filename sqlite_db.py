@@ -21,10 +21,13 @@ def update_database(data):
         if 'password' in device:
             encrypted_password = cipher.encrypt(device['password'].encode())
             device['password'] = encrypted_password.decode()
+        if 'key' in device:
+            encrypted_password = cipher.encrypt(device['key'].encode())
+            device['key'] = encrypted_password.decode()
 
     connect = sqlite3.connect('device_info.db')
     cursor = connect.cursor()
-    # Criar tabela caso nao tenha
+    # Cria tabela de dispositivos
     cursor.execute(''' 
                 CREATE TABLE IF NOT EXISTS devices (
                         id TEXT PRIMARY KEY,
@@ -36,11 +39,24 @@ def update_database(data):
                     )
                 ''')
     
+    # Cria tabela de cameras
+    cursor.execute('''CREATE TABLE cameras (
+                    id TEXT PRIMARY KEY,
+                    name TEXT,
+                    username TEXT,
+                    password TEXT,
+                    rtsp TEXT,
+                    snapshot TEXT,
+                    device_id TEXT,
+                    FOREIGN KEY(device_id) REFERENCES devices(id)
+                  )''')
+    
     # Apaga os dados existentes
     cursor.execute("DELETE FROM devices")
 
     # Adiciona linha na tabela
     for devices in data:
+        cameras = devices['cameras']
         query = f'''INSERT INTO devices (
                             id, 
                             name, 
@@ -55,8 +71,23 @@ def update_database(data):
                         "{devices['password']}", 
                         "{devices['key']}", 
                         "{len(devices['cameras'])}")'''
-        print(query)
         cursor.execute(query)
+        query = f'''INSERT INTO devices (
+                            id, 
+                            name, 
+                            rtsp,
+                            snapshot,
+                            username, 
+                            password,
+                            device_id) 
+                    VALUES (
+                        "{cameras['id']}", 
+                        "{cameras['name']}", 
+                        "{cameras['rtsp']}", 
+                        "{cameras['snapshot']}", 
+                        "{cameras['username']}", 
+                        "{cameras['password']}", 
+                        "{devices['id']}")'''
 
     connect.commit()
     connect.close()
