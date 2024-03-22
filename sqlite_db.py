@@ -40,13 +40,14 @@ def update_database(data):
                 ''')
     
     # Cria tabela de cameras
-    cursor.execute('''CREATE TABLE cameras (
+    cursor.execute('''
+                   CREATE TABLE IF NOT EXISTS cameras (
                     id TEXT PRIMARY KEY,
                     name TEXT,
-                    username TEXT,
-                    password TEXT,
                     rtsp TEXT,
                     snapshot TEXT,
+                    username TEXT,
+                    password TEXT,
                     device_id TEXT,
                     FOREIGN KEY(device_id) REFERENCES devices(id)
                   )''')
@@ -72,23 +73,25 @@ def update_database(data):
                         "{devices['key']}", 
                         "{len(devices['cameras'])}")'''
         cursor.execute(query)
-        query = f'''INSERT INTO devices (
-                            id, 
-                            name, 
-                            rtsp,
-                            snapshot,
-                            username, 
-                            password,
-                            device_id) 
-                    VALUES (
-                        "{cameras['id']}", 
-                        "{cameras['name']}", 
-                        "{cameras['rtsp']}", 
-                        "{cameras['snapshot']}", 
-                        "{cameras['username']}", 
-                        "{cameras['password']}", 
-                        "{devices['id']}")'''
-
+        for index, camera in enumerate(cameras):
+            query = f'''INSERT INTO cameras (
+                                id, 
+                                name, 
+                                rtsp,
+                                snapshot,
+                                username, 
+                                password,
+                                device_id) 
+                        VALUES (
+                            "{camera['id']}", 
+                            "{camera['name']}", 
+                            "{camera['rtsp']}", 
+                            "{camera['snapshot']}", 
+                            "{camera['username']}", 
+                            "{camera['password']}", 
+                            "{devices['id']}")'''
+            cursor.execute(query)
+    #print(cameras[0]['id'])
     connect.commit()
     connect.close()
 
