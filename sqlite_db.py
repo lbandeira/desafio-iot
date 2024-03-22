@@ -114,7 +114,7 @@ def update_devices():
 
     #Faz leitura do JSON de forma local
     #data = read_devices_from_json()
-    
+
     if data:
         update_database(data)
         return jsonify({"message": "Database updated successfuly"}), 200
@@ -130,11 +130,11 @@ def get_devices():
     connection.close()
     return jsonify(devices)
 
-@app.route('/cameras', methods = ['GET'])
-def get_cameras():
+@app.route('/devices/<device_id>/cameras', methods = ['GET'])
+def get_cameras_from_device(device_id):
     connection = sqlite3.connect('device_info.db')
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM cameras")
+    cursor.execute("SELECT * FROM cameras WHERE device_id=?", (device_id,))
     devices = cursor.fetchall()
     connection.close()
     return jsonify(devices)
