@@ -4,12 +4,44 @@ from flask_cors import CORS
 import json
 
 from cryptography.fernet import Fernet
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
 
 key = Fernet.generate_key()
 cipher = Fernet(key)
+
+#Adicionando camada de seguranca para acesso ao BD
+users = {
+    'user1': {'password': 'password1', 'roles': ['admin']},
+    'user2': {'password': 'password2', 'roles': ['user']},
+}
+
+# Teste de autenticacao
+def authenticate(username, password):
+    if username in users and users[username]['password'] == password:
+        return True
+    return False
+
+def authorize(role):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if 'Authorization' not in request.headers:
+                return jsonify({'message': 'Missing Authorization header'}), 401
+
+            token = request.headers['Authorization']
+            username, password = token.split(':')
+            if not authenticate(username, password):
+                return jsonify({'message': 'Invalid credentials'}), 401
+
+            if role not in users[username]['roles']:
+                return jsonify({'message': 'Unauthorized access'}), 403
+
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 def read_devices_from_json():
     with open('devices.json', 'r') as file:
@@ -108,6 +140,7 @@ def update_database(data):
 #     conn.close()    
 
 @app.route('/update_devices', methods=['POST'])
+@authorize('admin')
 def update_devices():
     #Recebe JSON pela requisicao
     data = request.get_json()
@@ -122,6 +155,7 @@ def update_devices():
         return jsonify({"error": "Invalid JSON data"}), 400
 
 @app.route('/devices', methods = ['GET'])
+@authorize('admin')
 def get_devices():
     connection = sqlite3.connect('device_info.db')
     cursor = connection.cursor()
@@ -131,6 +165,7 @@ def get_devices():
     return jsonify(devices)
 
 @app.route('/devices/<device_id>/cameras', methods = ['GET'])
+@authorize('admin')
 def get_cameras_from_device(device_id):
     connection = sqlite3.connect('device_info.db')
     cursor = connection.cursor()
